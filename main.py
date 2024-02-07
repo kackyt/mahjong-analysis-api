@@ -7,7 +7,7 @@ from sentry_sdk.integrations.fastapi import FastApiIntegration
 import sentry_sdk
 from dotenv import load_dotenv
 
-from api.routers import game, kyoku
+from api.routers import game, kyoku, statistics, dataset
 
 load_dotenv()
 
@@ -37,5 +37,7 @@ async def root():
     return {"message": "Hello World"}
 
 
+app.include_router(dataset.router, prefix="/datasets", tags=["datasets"])
 app.include_router(game.router, prefix="/games", tags=["games"])
 app.include_router(kyoku.router, prefix="/kyokus", tags=["kyokus"])
+app.include_router(statistics.router, prefix="/statistics", tags=["statistics"])

@@ -43,7 +43,7 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poe.tasks.dev]
-shell = "uvicorn main:app --port 8000 --host 0.0.0.0"
+shell = "uvicorn main:app --port 8000 --host 0.0.0.0 --reload"
 interpreter = "bash"
 
 [tool.poetry.dependencies]
