@@ -14,7 +14,7 @@ async def get_kyokus_count(
     start_date: date,
     end_date: date,
     game_id: str | None = None,
-    # _=Depends(verify_token),
+    _=Depends(verify_token),
 ):
     return await kyoku_crud.get_kyokus_count(dataset_id, start_date, end_date, game_id)
 
@@ -27,8 +27,6 @@ async def get_kyokus(
     limit: int = Query(default=20, le=100),
     offset: int = Query(default=0, ge=0),
     game_id: str | None = None,
-    # _=Depends(verify_token),
+    _=Depends(verify_token),
 ):
-    return await kyoku_crud.get_kyokus(
-        dataset_id, start_date, end_date, limit, offset, game_id
-    )
+    return await kyoku_crud.get_kyokus(dataset_id, start_date, end_date, limit, offset, game_id)

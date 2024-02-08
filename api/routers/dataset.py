@@ -8,6 +8,6 @@ router = APIRouter()
 
 @router.get("", response_model=list[Dataset])
 async def get_datasets(
-    # _=Depends(verify_token),
+    _=Depends(verify_token),
 ):
     return await dataset_cruds.get_datasets()

@@ -13,7 +13,7 @@ async def get_games_count(
     dataset_id: str,
     start_date: date,
     end_date: date,
-    # _=Depends(verify_token),
+    _=Depends(verify_token),
 ):
     return await game_crud.get_games_count(dataset_id, start_date, end_date)
 
@@ -25,6 +25,6 @@ async def get_games(
     end_date: date,
     limit: int = Query(default=20, le=100),
     offset: int = Query(default=0, ge=0),
-    # _=Depends(verify_token),
+    _=Depends(verify_token),
 ):
     return await game_crud.get_games(dataset_id, start_date, end_date, limit, offset)

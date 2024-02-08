@@ -13,7 +13,7 @@ async def get_average_score_by_player(
     dataset_id: str,
     start_date: date,
     end_date: date,
-    # _=Depends(verify_token),
+    _=Depends(verify_token),
 ):
     return await statistics_crud.get_average_score_by_player(dataset_id, start_date, end_date)
 
@@ -23,7 +23,7 @@ async def get_yaku_count(
     dataset_id: str,
     start_date: date,
     end_date: date,
-    # _=Depends(verify_token),
+    _=Depends(verify_token),
 ):
     return await statistics_crud.get_yaku_count(dataset_id, start_date, end_date)
 
@@ -33,6 +33,6 @@ async def get_nagare_count(
     dataset_id: str,
     start_date: date,
     end_date: date,
-    # _=Depends(verify_token),
+    _=Depends(verify_token),
 ):
     return await statistics_crud.get_nagare_count(dataset_id, start_date, end_date)
