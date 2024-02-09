@@ -1,0 +1,73 @@
+[tool.black]
+line-length = 150
+target-version = ['py312']
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.terraform
+    | \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | buck-out
+    | build
+  )
+)
+'''
+
+[tool.isort]
+profile = "black"
+include_trailing_comma = true
+line_length = 150
+multi_line_output = 3
+skip = '''
+.git, .tox, .venv, .eggs, build, dist, docs, .terraform
+'''
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.flake8]
+max-line-length = 150
+extend-ignore = ["E203", "E231", "E722", "W503", "W504", "W605"]
+exclude = [".venv", ".git", ".tox", ".eggs", "build", "dist", "docs", ".terraform", "__pycache__"]
+
+[tool.poetry]
+name = "mahjong-analysis-api"
+version = "0.1.0"
+description = ""
+authors = ["Takaya Kakizaki <t_kaki@nextappli.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poe.tasks.dev]
+shell = "uvicorn main:app --port 8000 --host 0.0.0.0 --reload"
+interpreter = "bash"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.109.2"
+uvicorn = {extras = ["standard"], version="^0.27.0.post1"}
+gunicorn = "^21.2.0"
+google-cloud-firestore = "^2.14.0"
+google-cloud-bigquery = "^3.17.1"
+sentry-sdk = {extras = ["fastapi"], version="^1.40.0"}
+pyjwt = "^2.8.0"
+cryptography = "^42.0.2"
+python-dotenv = "^1.0.1"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.8.0"
+isort = {extras = ["pyproject"], version="^5.13.2"}
+black = "^24.1.1"
+flake8 = "^7.0.0"
+poethepoet = "^0.24.4"
+
+[tool.poetry.group.types.dependencies]
+types-pyjwt = "^1.7.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
