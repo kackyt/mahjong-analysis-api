@@ -1,10 +1,13 @@
+import asyncio
 from google.cloud import bigquery
 from datetime import date
+from functools import partial
 
 import api.schemas.game as game_schema
 
 
 async def get_games_count(dataset_id: str, start_date: date, end_date: date) -> int:
+    loop = asyncio.get_running_loop()
     client = bigquery.Client()
     dataset = client.get_dataset(client.project + "." + dataset_id)
     table = f"{client.project}.{dataset.dataset_id}.games"
@@ -22,15 +25,14 @@ async def get_games_count(dataset_id: str, start_date: date, end_date: date) -> 
             bigquery.ScalarQueryParameter("end_date", "DATE", end_date),
         ]
     )
-    query_job = client.query(query, job_config=job_config)
-    rows = query_job.result()
+    func = partial(client.query_and_wait, query, job_config=job_config)
+    rows = await loop.run_in_executor(None, func)
 
     return 0 if rows is None else next(rows)[0]
 
 
-async def get_games(
-    dataset_id: str, start_date: date, end_date: date, limit: int, offset: int
-) -> list[game_schema.Game]:
+async def get_games(dataset_id: str, start_date: date, end_date: date, limit: int, offset: int) -> list[game_schema.Game]:
+    loop = asyncio.get_running_loop()
     client = bigquery.Client()
     dataset = client.get_dataset(client.project + "." + dataset_id)
     table = f"{client.project}.{dataset.dataset_id}.games"
@@ -59,8 +61,8 @@ async def get_games(
             bigquery.ScalarQueryParameter("offset", "INT64", offset),
         ]
     )
-    query_job = client.query(query, job_config=job_config)
-    rows = query_job.result()
+    func = partial(client.query_and_wait, query, job_config=job_config)
+    rows = await loop.run_in_executor(None, func)
     games = []
     for row in rows:
         games.append(game_schema.Game(**row))

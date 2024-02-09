@@ -1,12 +1,13 @@
+import asyncio
 from google.cloud import bigquery
 from datetime import date
+from functools import partial
 
 import api.schemas.kyoku as kyoku_schema
 
 
-async def get_kyokus_count(
-    dataset_id: str, start_date: date, end_date: date, game_id: str | None
-) -> int:
+async def get_kyokus_count(dataset_id: str, start_date: date, end_date: date, game_id: str | None) -> int:
+    loop = asyncio.get_running_loop()
     client = bigquery.Client()
     dataset = client.get_dataset(client.project + "." + dataset_id)
     table = f"{client.project}.{dataset.dataset_id}.kyokus"
@@ -29,8 +30,8 @@ async def get_kyokus_count(
         params.append(bigquery.ScalarQueryParameter("game_id", "STRING", game_id))
 
     job_config = bigquery.QueryJobConfig(query_parameters=params)
-    query_job = client.query(query, job_config=job_config)
-    rows = query_job.result()
+    func = partial(client.query_and_wait, query, job_config=job_config)
+    rows = await loop.run_in_executor(None, func)
 
     return 0 if rows is None else next(rows)[0]
 
@@ -43,6 +44,7 @@ async def get_kyokus(
     offset: int,
     game_id: str | None,
 ) -> list[kyoku_schema.Kyoku]:
+    loop = asyncio.get_running_loop()
     client = bigquery.Client()
     dataset = client.get_dataset(client.project + "." + dataset_id)
     table = f"{client.project}.{dataset.dataset_id}.kyokus"
@@ -79,8 +81,8 @@ async def get_kyokus(
     """
 
     job_config = bigquery.QueryJobConfig(query_parameters=params)
-    query_job = client.query(query, job_config=job_config)
-    rows = query_job.result()
+    func = partial(client.query_and_wait, query, job_config=job_config)
+    rows = await loop.run_in_executor(None, func)
     kyokus = []
     for row in rows:
         kyokus.append(kyoku_schema.Kyoku(**row))

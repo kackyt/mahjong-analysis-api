@@ -1,10 +1,13 @@
+import asyncio
 from google.cloud import bigquery
 from datetime import date
+from functools import partial
 
 import api.schemas.statistics as statistics_schema
 
 
 async def get_average_score_by_player(dataset_id: str, start_date: date, end_date: date) -> list[statistics_schema.AverageScore]:
+    loop = asyncio.get_running_loop()
     client = bigquery.Client()
     dataset = client.get_dataset(client.project + "." + dataset_id)
     table_prefix = f"{client.project}.{dataset.dataset_id}"
@@ -29,13 +32,14 @@ async def get_average_score_by_player(dataset_id: str, start_date: date, end_dat
             bigquery.ScalarQueryParameter("end_date", "DATE", end_date),
         ]
     )
-    query_job = client.query(query, job_config=job_config)
-    rows = query_job.result()
+    func = partial(client.query_and_wait, query, job_config=job_config)
+    rows = await loop.run_in_executor(None, func)
 
     return [statistics_schema.AverageScore(**row) for row in rows]
 
 
 async def get_yaku_count(dataset_id: str, start_date: date, end_date: date) -> list[statistics_schema.YakuCount]:
+    loop = asyncio.get_running_loop()
     client = bigquery.Client()
     dataset = client.get_dataset(client.project + "." + dataset_id)
     table_prefix = f"{client.project}.{dataset.dataset_id}"
@@ -65,13 +69,14 @@ async def get_yaku_count(dataset_id: str, start_date: date, end_date: date) -> l
             bigquery.ScalarQueryParameter("end_date", "DATE", end_date),
         ]
     )
-    query_job = client.query(query, job_config=job_config)
-    rows = query_job.result()
+    func = partial(client.query_and_wait, query, job_config=job_config)
+    rows = await loop.run_in_executor(None, func)
 
     return [statistics_schema.YakuCount(**row) for row in rows]
 
 
 async def get_nagare_count(dataset_id: str, start_date: date, end_date: date) -> list[statistics_schema.NagareCount]:
+    loop = asyncio.get_running_loop()
     client = bigquery.Client()
     dataset = client.get_dataset(client.project + "." + dataset_id)
     table_prefix = f"{client.project}.{dataset.dataset_id}"
@@ -94,7 +99,7 @@ async def get_nagare_count(dataset_id: str, start_date: date, end_date: date) ->
             bigquery.ScalarQueryParameter("end_date", "DATE", end_date),
         ]
     )
-    query_job = client.query(query, job_config=job_config)
-    rows = query_job.result()
+    func = partial(client.query_and_wait, query, job_config=job_config)
+    rows = await loop.run_in_executor(None, func)
 
     return [statistics_schema.NagareCount(**row) for row in rows]
